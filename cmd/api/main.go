@@ -21,12 +21,6 @@ type application struct {
 	logger *log.Logger
 }
 
-// Return information about the API, including current version
-// and operating environment - dev, prod or staging
-func (app *application) checkHealth(writer http.ResponseWriter, request *http.Request) {
-
-}
-
 func main() {
 	var cfg config
 
@@ -46,7 +40,7 @@ func main() {
 	mux.HandleFunc("/v1/healthcheck", app.checkHealth)
 
 	server := &http.Server{
-		Handler:      mux,
+		Handler:      app.routes(),
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  time.Second * 10,

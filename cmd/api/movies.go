@@ -3,16 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strconv"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func (app *application) showMovie(writer http.ResponseWriter, request *http.Request) {
-	movieId, err := strconv.Atoi(chi.URLParam(request, "id"))
+	movieId, err := app.readIDParam(request)
 	if err != nil {
 		http.NotFound(writer, request)
-		// fmt.Fprintln(writer, "No movie with that id exists")
 		return
 	}
 

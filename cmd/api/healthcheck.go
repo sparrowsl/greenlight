@@ -8,7 +8,9 @@ import (
 // Return information about the API, including current version
 // and operating environment - dev, prod or staging
 func (app *application) checkHealth(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "status: available")
-	fmt.Fprintf(writer, "environment: %s\n", app.config.env)
-	fmt.Fprintf(writer, "version: %s\n", version)
+	js := `{"status": available, "environment": %q, "version": %q}`
+	js = fmt.Sprintf(js, app.config.env, version)
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write([]byte(js))
 }

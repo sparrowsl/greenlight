@@ -24,7 +24,8 @@ func (app *application) showMovie(writer http.ResponseWriter, request *http.Requ
 		Version:   1,
 	}
 
-	if err := app.writeJSON(writer, http.StatusOK, newMovie, nil); err != nil {
+	err = app.writeJSON(writer, http.StatusOK, map[string]any{"movie": newMovie}, nil)
+	if err != nil {
 		app.logger.Print(err)
 		return
 	}

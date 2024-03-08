@@ -11,7 +11,7 @@ import (
 func (app *application) showMovie(writer http.ResponseWriter, request *http.Request) {
 	movieId, err := app.readIDParam(request)
 	if err != nil {
-		http.NotFound(writer, request)
+		app.notFoundResponse(writer, request)
 		return
 	}
 
@@ -26,8 +26,7 @@ func (app *application) showMovie(writer http.ResponseWriter, request *http.Requ
 
 	err = app.writeJSON(writer, http.StatusOK, map[string]any{"movie": newMovie}, nil)
 	if err != nil {
-		app.logger.Print(err)
-		return
+		app.serverErrorResponse(writer, request, err)
 	}
 }
 

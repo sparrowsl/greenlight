@@ -14,8 +14,6 @@ func (app *application) checkHealth(writer http.ResponseWriter, request *http.Re
 
 	err := app.writeJSON(writer, http.StatusOK, map[string]any{"status": "available", "system_info": data}, nil)
 	if err != nil {
-		app.logger.Print(err)
-		http.Error(writer, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
-		return
+		app.serverErrorResponse(writer, request, err)
 	}
 }

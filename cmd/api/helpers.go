@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -40,11 +41,18 @@ func (app *application) writeJSON(writer http.ResponseWriter, status int, data m
 }
 
 func (app *application) readJSON(writer http.ResponseWriter, request *http.Request, dest any) error {
-	err := json.NewDecoder(request.Body).Decode(dest)
+	maxBytes := 1_048_576 // limit for the request body size
+	request.Body = http.MaxBytesReader(writer, request.Body, int64(maxBytes))
+
+	dec := json.NewDecoder(request.Body)
+	dec.DisallowUnknownFields()
+
+	err := dec.Decode(dest)
 	if err != nil {
 		var syntaxError *json.SyntaxError
 		var unmarshalTypeError *json.UnmarshalTypeError
 		var invalidUnmarshalError *json.InvalidUnmarshalError
+		var maxBytesError *http.MaxBytesError
 
 		switch {
 		case errors.As(err, &syntaxError):
@@ -63,12 +71,23 @@ func (app *application) readJSON(writer http.ResponseWriter, request *http.Reque
 		case errors.Is(err, io.EOF):
 			return errors.New("body must not be empty")
 
+		case strings.HasPrefix(err.Error(), "json: unknown field "):
+			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
+			return fmt.Errorf("body contains unknown key %s", fieldName)
+
+		case errors.As(err, &maxBytesError):
+			return fmt.Errorf("body must not be larger than %d bytes", maxBytesError.Limit)
+
 		case errors.As(err, &invalidUnmarshalError):
 			panic(err)
 
 		default:
 			return err
 		}
+	}
+
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		return errors.New("body must only contain a single JSON value")
 	}
 
 	return nil

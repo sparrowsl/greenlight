@@ -26,6 +26,7 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 5000, "API Server Port")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment (dev|staging|prod)")
+	flag.String("dsn", "postgres://greenlight:password@localhost/greenlight", "DSN for database")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)

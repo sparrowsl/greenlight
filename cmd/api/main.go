@@ -12,6 +12,7 @@ import (
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/sparrowsl/greenlight/internal/data"
 )
 
 const version = "1.0.0"
@@ -30,6 +31,7 @@ type config struct {
 type application struct {
 	config config
 	logger *log.Logger
+	models data.Models
 }
 
 func init() {
@@ -62,6 +64,7 @@ func main() {
 	app := &application{
 		config: cfg,
 		logger: logger,
+		models: data.NewModel(db),
 	}
 
 	server := &http.Server{
@@ -83,6 +86,7 @@ func openDB(conf config) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// Set the maximum number of open (in-use + idle) connections in the pool. Note that
 	// passing a value less than or equal to 0 will mean there is no limit.
 	db.SetMaxOpenConns(conf.db.maxOpenConns)
@@ -100,6 +104,7 @@ func openDB(conf config) (*sql.DB, error) {
 
 	// Set the maximum idle timeout.
 	db.SetConnMaxIdleTime(duration)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 

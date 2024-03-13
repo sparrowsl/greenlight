@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/sparrowsl/greenlight/internal/validator"
@@ -14,6 +15,10 @@ type Movie struct {
 	Genres    []string  `json:"genres,omitempty"`
 	Version   int32     `json:"version"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type MovieModel struct {
+	DB *sql.DB
 }
 
 func ValidateMovie(val *validator.Validator, movie *Movie) {
@@ -31,4 +36,20 @@ func ValidateMovie(val *validator.Validator, movie *Movie) {
 	val.Check(len(movie.Genres) >= 1, "genres", "must contain at least 1 genre")
 	val.Check(len(movie.Genres) <= 5, "genres", "must not contain more than 5 genres")
 	val.Check(validator.Unique(movie.Genres), "genres", "must not contain duplicate values")
+}
+
+func (m *MovieModel) Insert(movie *Movie) error {
+	return nil
+}
+
+func (m *MovieModel) Get(id int64) (*Movie, error) {
+	return &Movie{}, nil
+}
+
+func (m *MovieModel) Update(movie *Movie) error {
+	return nil
+}
+
+func (m *MovieModel) Delete(id int64) error {
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/sparrowsl/greenlight/internal/validator"
 )
 
@@ -39,7 +40,13 @@ func ValidateMovie(val *validator.Validator, movie *Movie) {
 }
 
 func (m *MovieModel) Insert(movie *Movie) error {
-	return nil
+	statement := `INSERT INTO movies (title, year, runtime, genres)
+                VALUES ($1, $2, $3, $4)
+                RETURNING id, created_at, version`
+
+	row := m.DB.QueryRow(statement, movie.Title, movie.Year, movie.Runtime, pq.Array(movie.Genres))
+
+	return row.Scan(&movie.ID, &movie.CreatedAt, &movie.Version)
 }
 
 func (m *MovieModel) Get(id int64) (*Movie, error) {

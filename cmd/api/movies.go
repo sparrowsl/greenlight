@@ -68,7 +68,7 @@ func (app *application) createMovie(writer http.ResponseWriter, request *http.Re
 	headers := make(http.Header)
 	headers.Set("Location", fmt.Sprintf("/v1/movies/%d", movie.ID))
 
-	app.writeJSON(writer, http.StatusOK, map[string]any{"movie": movie}, nil)
+	app.writeJSON(writer, http.StatusCreated, map[string]any{"movie": movie}, nil)
 }
 
 func (app *application) updateMovie(writer http.ResponseWriter, request *http.Request) {
@@ -118,6 +118,29 @@ func (app *application) updateMovie(writer http.ResponseWriter, request *http.Re
 	}
 
 	err = app.writeJSON(writer, http.StatusOK, map[string]any{"movie": movie}, nil)
+	if err != nil {
+		app.serverErrorResponse(writer, request, err)
+	}
+}
+
+func (app *application) deleteMovie(writer http.ResponseWriter, request *http.Request) {
+	movieId, err := app.readIDParam(request)
+	if err != nil {
+		app.notFoundResponse(writer, request)
+		return
+	}
+
+	if err := app.models.Movies.Delete(movieId); err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(writer, request)
+		default:
+			app.serverErrorResponse(writer, request, err)
+		}
+		return
+	}
+
+	err = app.writeJSON(writer, http.StatusNoContent, map[string]any{"message": "movie successfully deleted"}, nil)
 	if err != nil {
 		app.serverErrorResponse(writer, request, err)
 	}

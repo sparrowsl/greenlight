@@ -70,3 +70,55 @@ func (app *application) createMovie(writer http.ResponseWriter, request *http.Re
 
 	app.writeJSON(writer, http.StatusOK, map[string]any{"movie": movie}, nil)
 }
+
+func (app *application) updateMovie(writer http.ResponseWriter, request *http.Request) {
+	movieId, err := app.readIDParam(request)
+	if err != nil {
+		app.notFoundResponse(writer, request)
+		return
+	}
+
+	movie, err := app.models.Movies.Get(movieId)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(writer, request)
+		default:
+			app.serverErrorResponse(writer, request, err)
+		}
+		return
+	}
+
+	var input struct {
+		Title   string       `json:"title"`
+		Year    int32        `json:"year"`
+		Runtime data.Runtime `json:"runtime"`
+		Genres  []string     `json:"genres"`
+	}
+
+	if err = app.readJSON(writer, request, &input); err != nil {
+		app.badRequestResponse(writer, request, err)
+		return
+	}
+
+	movie.Title = input.Title
+	movie.Year = input.Year
+	movie.Runtime = input.Runtime
+	movie.Genres = input.Genres
+
+	val := validator.New()
+	if data.ValidateMovie(val, movie); !val.Valid() {
+		app.failedValidationResponse(writer, request, val.Errors)
+		return
+	}
+
+	if err := app.models.Movies.Update(movie); err != nil {
+		app.serverErrorResponse(writer, request, err)
+		return
+	}
+
+	err = app.writeJSON(writer, http.StatusOK, map[string]any{"movie": movie}, nil)
+	if err != nil {
+		app.serverErrorResponse(writer, request, err)
+	}
+}

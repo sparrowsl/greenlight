@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 	router.Get("/v1/healthcheck", app.checkHealth)
 	router.Post("/v1/movies", app.createMovie)
 	router.Get("/v1/movies/{id}", app.showMovie)
+	router.Put("/v1/movies/{id}", app.updateMovie)
 
 	return router
 }

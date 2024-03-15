@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
@@ -61,7 +62,10 @@ func (m *MovieModel) Get(id int64) (*Movie, error) {
 
 	var movie Movie
 
-	row := m.DB.QueryRow(statement, id)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	row := m.DB.QueryRowContext(ctx, statement, id)
 	err := row.Scan(&movie.ID, &movie.Title, &movie.Year, &movie.Runtime, &movie.CreatedAt, pq.Array(&movie.Genres), &movie.Version)
 	if err != nil {
 		switch {
@@ -102,7 +106,10 @@ func (m *MovieModel) Delete(id int64) error {
 	statement := `DELETE FROM movies
                 WHERE id = $1`
 
-	result, err := m.DB.Exec(statement, id)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	result, err := m.DB.ExecContext(ctx, statement, id)
 	if err != nil {
 		return err
 	}

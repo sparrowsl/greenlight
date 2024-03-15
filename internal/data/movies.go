@@ -78,10 +78,10 @@ func (m *MovieModel) Get(id int64) (*Movie, error) {
 func (m *MovieModel) Update(movie *Movie) error {
 	statement := `UPDATE movies
                 SET title = $1, year = $2, runtime = $3, genres = $4, version = version + 1 
-                WHERE id = $5
+                WHERE id = $5 AND version = $6
                 RETURNING version`
 
-	row := m.DB.QueryRow(statement, movie.Title, movie.Year, movie.Runtime, pq.Array(movie.Genres), movie.ID)
+	row := m.DB.QueryRow(statement, movie.Title, movie.Year, movie.Runtime, pq.Array(movie.Genres), movie.ID, movie.Version)
 	return row.Scan(&movie.Version)
 }
 

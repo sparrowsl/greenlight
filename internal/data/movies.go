@@ -82,7 +82,16 @@ func (m *MovieModel) Update(movie *Movie) error {
                 RETURNING version`
 
 	row := m.DB.QueryRow(statement, movie.Title, movie.Year, movie.Runtime, pq.Array(movie.Genres), movie.ID, movie.Version)
-	return row.Scan(&movie.Version)
+	if err := row.Scan(&movie.Version); err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrEditConflict
+		default:
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m *MovieModel) Delete(id int64) error {

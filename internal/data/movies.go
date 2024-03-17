@@ -54,19 +54,35 @@ func (m *MovieModel) Insert(movie *Movie) error {
 func (m *MovieModel) GetAll() ([]Movie, error) {
 	statement := `SELECT id, title, year, runtime, created_at, genres, version 
                 FROM movies
-                ORDER BY created_at`
+                ORDER BY id`
 
-	rows, err := m.DB.Query(statement)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, statement)
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return nil, ErrRecordNotFound
-		default:
+		return nil, err
+	}
+	defer rows.Close()
+
+	movies := []Movie{}
+
+	for rows.Next() {
+		var movie Movie
+
+		err := rows.Scan(&movie.ID, &movie.Title, &movie.Year, &movie.Runtime, &movie.CreatedAt, pq.Array(&movie.Genres), &movie.Version)
+		if err != nil {
 			return nil, err
 		}
+
+		movies = append(movies, movie)
 	}
-	_ = rows
-	return []Movie{}, nil
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return movies, nil
 }
 
 func (m *MovieModel) Get(id int64) (*Movie, error) {

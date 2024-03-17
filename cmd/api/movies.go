@@ -35,7 +35,16 @@ func (app *application) listAllMovies(writer http.ResponseWriter, request *http.
 		return
 	}
 
-	fmt.Fprintf(writer, "%+v\n", input)
+	movies, err := app.models.Movies.GetAll()
+	if err != nil {
+		app.serverErrorResponse(writer, request, err)
+		return
+	}
+
+	err = app.writeJSON(writer, http.StatusOK, map[string]any{"length": len(movies), "movies": movies}, nil)
+	if err != nil {
+		app.serverErrorResponse(writer, request, err)
+	}
 }
 
 func (app *application) showMovie(writer http.ResponseWriter, request *http.Request) {

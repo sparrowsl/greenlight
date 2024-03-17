@@ -11,11 +11,9 @@ import (
 
 func (app *application) listAllMovies(writer http.ResponseWriter, request *http.Request) {
 	var input struct {
-		Title    string
-		Genres   []string
-		Page     int
-		PageSize int
-		Sort     string
+		Title  string
+		Genres []string
+		data.Filters
 	}
 
 	val := validator.New()
@@ -24,12 +22,12 @@ func (app *application) listAllMovies(writer http.ResponseWriter, request *http.
 	input.Title = app.readString(query, "title", "")
 	input.Genres = app.readCSV(query, "genres", []string{})
 
-	input.Page = app.readInt(query, "page", 1, val)
-	input.PageSize = app.readInt(query, "page_size", 20, val)
+	input.Filters.Page = app.readInt(query, "page", 1, val)
+	input.Filters.PageSize = app.readInt(query, "page_size", 20, val)
 
 	// Extract the sort query string value, falling back to "id" i
 	// by the client (which will imply a ascending sort on movie I
-	input.Sort = app.readString(query, "sort", "id")
+	input.Filters.Sort = app.readString(query, "sort", "id")
 
 	if !val.Valid() {
 		app.failedValidationResponse(writer, request, val.Errors)

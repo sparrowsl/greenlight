@@ -9,6 +9,36 @@ import (
 	"github.com/sparrowsl/greenlight/internal/validator"
 )
 
+func (app *application) listAllMovies(writer http.ResponseWriter, request *http.Request) {
+	var input struct {
+		Title    string
+		Genres   []string
+		Page     int
+		PageSize int
+		Sort     string
+	}
+
+	val := validator.New()
+	query := request.URL.Query()
+
+	input.Title = app.readString(query, "title", "")
+	input.Genres = app.readCSV(query, "genres", []string{})
+
+	input.Page = app.readInt(query, "page", 1, val)
+	input.PageSize = app.readInt(query, "page_size", 20, val)
+
+	// Extract the sort query string value, falling back to "id" i
+	// by the client (which will imply a ascending sort on movie I
+	input.Sort = app.readString(query, "sort", "id")
+
+	if !val.Valid() {
+		app.failedValidationResponse(writer, request, val.Errors)
+		return
+	}
+
+	fmt.Fprintf(writer, "%+v\n", input)
+}
+
 func (app *application) showMovie(writer http.ResponseWriter, request *http.Request) {
 	movieId, err := app.readIDParam(request)
 	if err != nil {

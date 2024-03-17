@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/sparrowsl/greenlight/internal/validator"
 )
 
 func (app *application) readIDParam(request *http.Request) (int64, error) {
@@ -91,4 +93,47 @@ func (app *application) readJSON(writer http.ResponseWriter, request *http.Reque
 	}
 
 	return nil
+}
+
+// The readString() helper returns a string value from the query string, or the provided
+// default value if no matching key could be found.
+func (app *application) readString(query url.Values, key string, defaultValue string) string {
+	str := query.Get(key)
+
+	if str == "" {
+		return defaultValue
+	}
+
+	return str
+}
+
+func (app *application) readCSV(query url.Values, key string, defaultValue []string) []string {
+	csv := query.Get(key)
+
+	if csv == "" {
+		return defaultValue
+	}
+
+	return strings.Split(csv, ",")
+}
+
+func (app *application) readInt(query url.Values, key string, defaultValue int, validator *validator.Validator) int {
+	// Extract the value from the query string.
+	s := query.Get(key)
+
+	// If no key exists (or the value is empty) then return the default value.
+	if s == "" {
+		return defaultValue
+	}
+
+	// Try to convert the value to an int. If this fails, add an error message to the
+	// validator instance and return the default value.
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		validator.AddError(key, "must be an integer value")
+		return defaultValue
+	}
+
+	// Otherwise, return the converted integer value.
+	return i
 }

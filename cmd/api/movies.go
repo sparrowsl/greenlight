@@ -28,8 +28,9 @@ func (app *application) listAllMovies(writer http.ResponseWriter, request *http.
 	// Extract the sort query string value, falling back to "id" i
 	// by the client (which will imply a ascending sort on movie I
 	input.Filters.Sort = app.readString(query, "sort", "id")
+	input.Filters.SortSafelist = []string{"id", "title", "year", "runtime", "-id", "-title", "-year", "-runtime"}
 
-	if !val.Valid() {
+	if data.ValidateFilters(val, input.Filters); !val.Valid() {
 		app.failedValidationResponse(writer, request, val.Errors)
 		return
 	}

@@ -35,7 +35,7 @@ func (app *application) listAllMovies(writer http.ResponseWriter, request *http.
 		return
 	}
 
-	movies, err := app.models.Movies.GetAll()
+	movies, err := app.models.Movies.GetAll(input.Title, input.Genres, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(writer, request, err)
 		return

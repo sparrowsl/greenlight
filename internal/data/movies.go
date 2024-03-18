@@ -51,15 +51,17 @@ func (m *MovieModel) Insert(movie *Movie) error {
 	return row.Scan(&movie.ID, &movie.CreatedAt, &movie.Version)
 }
 
-func (m *MovieModel) GetAll() ([]Movie, error) {
+func (m *MovieModel) GetAll(title string, genres []string, filters Filters) ([]Movie, error) {
 	statement := `SELECT id, title, year, runtime, created_at, genres, version 
                 FROM movies
+                WHERE (LOWER(title) = LOWER($1) OR $1 = '')
+                AND (genres @> $2 OR $2 = '{}')
                 ORDER BY id`
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 
-	rows, err := m.DB.QueryContext(ctx, statement)
+	rows, err := m.DB.QueryContext(ctx, statement, title, pq.Array(genres))
 	if err != nil {
 		return nil, err
 	}

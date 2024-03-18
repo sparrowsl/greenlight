@@ -54,7 +54,7 @@ func (m *MovieModel) Insert(movie *Movie) error {
 func (m *MovieModel) GetAll(title string, genres []string, filters Filters) ([]Movie, error) {
 	statement := `SELECT id, title, year, runtime, created_at, genres, version 
                 FROM movies
-                WHERE (LOWER(title) = LOWER($1) OR $1 = '')
+                WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
                 AND (genres @> $2 OR $2 = '{}')
                 ORDER BY id`
 

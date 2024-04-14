@@ -1,6 +1,7 @@
 package data
 
 import (
+	"math"
 	"strings"
 
 	"github.com/sparrowsl/greenlight/internal/validator"
@@ -13,6 +14,14 @@ type Filters struct {
 	SortSafelist []string
 }
 
+type Metadata struct {
+	CurrentPage  int `json:"current_page,omitempty"`
+	PageSize     int `json:"page_size,omitempty"`
+	FirstPage    int `json:"first_page,omitempty"`
+	LastPage     int `json:"last_page,omitempty"`
+	TotalRecords int `json:"total_records,omitempty"`
+}
+
 func ValidateFilters(val *validator.Validator, filters Filters) {
 	// Check that the page and page_size parameters contain sensible values.
 	val.Check(filters.Page > 0, "page", "must be greater than zero")
@@ -22,6 +31,20 @@ func ValidateFilters(val *validator.Validator, filters Filters) {
 
 	// Check that the sort parameter matches a value in the safelist.
 	val.Check(validator.PermittedValue(filters.Sort, filters.SortSafelist...), "sort", "invalid sort value")
+}
+
+func calculateMetadata(totalRecords int, page int, pageSize int) Metadata {
+	if totalRecords == 0 {
+		return Metadata{}
+	}
+
+	return Metadata{
+		CurrentPage:  page,
+		PageSize:     pageSize,
+		FirstPage:    1,
+		LastPage:     int(math.Ceil(float64(totalRecords) / float64(pageSize))),
+		TotalRecords: totalRecords,
+	}
 }
 
 func (filters Filters) limit() int {

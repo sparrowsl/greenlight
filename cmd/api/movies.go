@@ -35,13 +35,13 @@ func (app *application) listAllMovies(writer http.ResponseWriter, request *http.
 		return
 	}
 
-	movies, err := app.models.Movies.GetAll(input.Title, input.Genres, input.Filters)
+	movies, metadata, err := app.models.Movies.GetAll(input.Title, input.Genres, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(writer, request, err)
 		return
 	}
 
-	err = app.writeJSON(writer, http.StatusOK, map[string]any{"length": len(movies), "movies": movies}, nil)
+	err = app.writeJSON(writer, http.StatusOK, map[string]any{"metadata": metadata, "movies": movies}, nil)
 	if err != nil {
 		app.serverErrorResponse(writer, request, err)
 	}

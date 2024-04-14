@@ -24,6 +24,14 @@ func ValidateFilters(val *validator.Validator, filters Filters) {
 	val.Check(validator.PermittedValue(filters.Sort, filters.SortSafelist...), "sort", "invalid sort value")
 }
 
+func (filters Filters) limit() int {
+	return filters.PageSize
+}
+
+func (filters Filters) offset() int {
+	return (filters.Page - 1) * filters.PageSize
+}
+
 func (filters Filters) sortColumn() string {
 	for _, safeValue := range filters.SortSafelist {
 		if filters.Sort == safeValue {

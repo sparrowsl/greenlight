@@ -78,16 +78,7 @@ func main() {
 		models: data.NewModel(db),
 	}
 
-	server := &http.Server{
-		Handler:      app.routes(),
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  time.Second * 10,
-		WriteTimeout: time.Second * 30,
-	}
-
-	logger.Printf("starting %s server on %s\n", cfg.env, server.Addr)
-	if err := server.ListenAndServe(); err != nil {
+	if err := app.serve(); err != nil {
 		logger.Fatal(err)
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (app *application) logError(request *http.Request, err error) {
+func (app *application) logError(_ *http.Request, err error) {
 	app.logger.Print(err)
 }
 

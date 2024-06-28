@@ -11,3 +11,5 @@ require github.com/joho/godotenv v1.5.1
 require golang.org/x/time v0.5.0
 
 require golang.org/x/crypto v0.22.0
+
+require github.com/wneessen/go-mail v0.4.2 // indirect

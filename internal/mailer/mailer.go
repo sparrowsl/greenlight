@@ -71,11 +71,17 @@ func (m Mailer) Send(recipient string, templateFile string, data any) error {
 	msg.SetBodyString(mail.TypeTextPlain, plainBody.String())
 	msg.SetBodyHTMLTemplate(templ, data)
 
-	err = m.dialer.DialAndSend(msg)
-	if err != nil {
-		fmt.Println("Failed:" + err.Error())
-		return err
+	// try to send the mail 3 times before finally aborting
+	// if email successful, then return and cancel the other retries
+	for i := 1; i <= 3; i++ {
+		err = m.dialer.DialAndSend(msg)
+		if nil == err {
+			return nil // if everything works, return successful/nil
+		}
+
+		// sleep 500ms between sending emails
+		time.Sleep(time.Millisecond * 500)
 	}
 
-	return nil
+	return err
 }

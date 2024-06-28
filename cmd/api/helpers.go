@@ -137,3 +137,16 @@ func (app *application) readInt(query url.Values, key string, defaultValue int, 
 	// Otherwise, return the converted integer value.
 	return i
 }
+
+func (app *application) background(fn func()) {
+	go func() {
+		// catch any panic in the background if code fails/crashes
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.Println(fmt.Errorf("%s", err))
+			}
+		}()
+
+		fn() // run the function to run in the background
+	}()
+}

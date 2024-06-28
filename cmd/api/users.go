@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/sparrowsl/greenlight/internal/data"
@@ -52,20 +51,13 @@ func (app *application) registerUser(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	go func() {
-		// catch any panic if email code fails/crashes
-		defer func() {
-			if err := recover(); err != nil {
-				app.logger.Println(fmt.Errorf("%s", err))
-			}
-		}()
-
+	app.background(func() {
 		// send the welcome email
 		err := app.mailer.Send(user.Email, "user_welcome.html", user)
 		if err != nil {
 			app.logger.Println(err)
 		}
-	}()
+	})
 
 	err := app.writeJSON(writer, http.StatusAccepted, map[string]any{"user": user}, nil)
 	if err != nil {

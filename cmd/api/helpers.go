@@ -139,7 +139,11 @@ func (app *application) readInt(query url.Values, key string, defaultValue int, 
 }
 
 func (app *application) background(fn func()) {
+	app.wg.Add(1)
+
 	go func() {
+		defer app.wg.Done()
+
 		// catch any panic in the background if code fails/crashes
 		defer func() {
 			if err := recover(); err != nil {

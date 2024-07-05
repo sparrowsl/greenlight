@@ -24,7 +24,8 @@ func (app *application) routes() http.Handler {
 	router.Patch("/v1/movies/{id}", app.updateMovie)
 	router.Delete("/v1/movies/{id}", app.deleteMovie)
 
-	router.Put("/v1/users/activated", app.activateUserToken)
+	// TODO: add a standalone endpoint to generate tokens
+	router.Put("/v1/users/activated", app.activateUser)
 	router.Post("/v1/users", app.registerUser)
 
 	return router

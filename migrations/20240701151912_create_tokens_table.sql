@@ -1,5 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
+CREATE EXTENSION IF NOT EXISTS CITEXT;
+
 CREATE TABLE IF NOT EXISTS tokens (
   hash bytea PRIMARY KEY,
   user_id bigint NOT NULL REFERENCES users ON DELETE CASCADE,

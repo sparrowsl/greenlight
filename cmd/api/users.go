@@ -115,11 +115,11 @@ func (app *application) activateUser(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	// err = app.models.Tokens.DeleteAllForUser(data.ScopeActivation, user.ID)
-	// if err != nil {
-	// 	app.serverErrorResponse(writer, request, err)
-	// 	return
-	// }
+	err = app.models.Tokens.DeleteAllForUser(data.ScopeActivation, user.ID)
+	if err != nil {
+		app.serverErrorResponse(writer, request, err)
+		return
+	}
 
 	err = app.writeJSON(writer, http.StatusOK, map[string]any{"user": user}, nil)
 	if err != nil {

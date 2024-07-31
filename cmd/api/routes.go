@@ -18,15 +18,17 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed(app.methodNotAllowedResponse)
 
 	router.Get("/v1/healthcheck", app.checkHealth)
+
 	router.Post("/v1/movies", app.createMovie)
 	router.Get("/v1/movies", app.listAllMovies)
 	router.Get("/v1/movies/{id}", app.showMovie)
 	router.Patch("/v1/movies/{id}", app.updateMovie)
 	router.Delete("/v1/movies/{id}", app.deleteMovie)
 
-	// TODO: add a standalone endpoint to generate tokens
 	router.Put("/v1/users/activated", app.activateUser)
 	router.Post("/v1/users", app.registerUser)
+
+	router.Post("/v1/tokens/authentication", app.createAuthenticationToken)
 
 	return router
 }

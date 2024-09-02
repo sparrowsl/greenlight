@@ -15,6 +15,8 @@ var (
 	ErrDuplicateEmail = errors.New("duplicate email")
 )
 
+var AnonymousUser = &User{}
+
 type User struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -28,6 +30,10 @@ type User struct {
 type password struct {
 	plaintext *string
 	hash      []byte
+}
+
+func (u *User) IsAnonymous() bool {
+	return u == AnonymousUser
 }
 
 func (p *password) Set(plaintextPassword string) error {
@@ -109,7 +115,7 @@ func (m *UserModel) Insert(user *User) error {
 }
 
 func (m *UserModel) GetByEmail(email string) (*User, error) {
-	statement := `SELECT id, created_at, name, email, password_hash, activated, version 
+	statement := `SELECT id, created_at, name, email, password_hash, activated, version
 				  FROM users
 				  WHERE email = $1`
 
@@ -134,7 +140,7 @@ func (m *UserModel) GetByEmail(email string) (*User, error) {
 
 func (m *UserModel) Update(user *User) error {
 	statement := `UPDATE users
-					  SET name = $1, email = $2, password_hash = $3, activated = $4, version = version + 1 
+					  SET name = $1, email = $2, password_hash = $3, activated = $4, version = version + 1
 					  WHERE id = $5 AND version = $6
 					  RETURNING version`
 

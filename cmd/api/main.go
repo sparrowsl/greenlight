@@ -56,7 +56,6 @@ func init() {
 
 func main() {
 	var cfg config
-	flag.String("", "", "")
 	flag.IntVar(&cfg.port, "port", 5000, "API Server Port")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment (dev|staging|prod)")
 

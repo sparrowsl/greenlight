@@ -13,6 +13,7 @@ func (app *application) routes() http.Handler {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
 	router.Use(app.rateLimit)
+	router.Use(app.authenticate)
 
 	router.NotFound(app.notFoundResponse)
 	router.MethodNotAllowed(app.methodNotAllowedResponse)

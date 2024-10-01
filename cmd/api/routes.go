@@ -20,11 +20,15 @@ func (app *application) routes() http.Handler {
 
 	router.Get("/v1/healthcheck", app.checkHealth)
 
-	router.Post("/v1/movies", app.createMovie)
-	router.Get("/v1/movies", app.listAllMovies)
-	router.Get("/v1/movies/{id}", app.showMovie)
-	router.Patch("/v1/movies/{id}", app.updateMovie)
-	router.Delete("/v1/movies/{id}", app.deleteMovie)
+	router.Group(func(r chi.Router) {
+		r.Use(app.requireActivatedUser)
+
+		r.Post("/v1/movies", app.createMovie)
+		r.Get("/v1/movies", app.listAllMovies)
+		r.Get("/v1/movies/{id}", app.showMovie)
+		r.Patch("/v1/movies/{id}", app.updateMovie)
+		r.Delete("/v1/movies/{id}", app.deleteMovie)
+	})
 
 	router.Put("/v1/users/activated", app.activateUser)
 	router.Post("/v1/users", app.registerUser)

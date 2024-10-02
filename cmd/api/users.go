@@ -72,6 +72,12 @@ func (app *application) registerUser(writer http.ResponseWriter, request *http.R
 	}
 }
 
+func (app *application) getAllUsers(writer http.ResponseWriter, request *http.Request) {
+	users, _ := app.models.Users.GetAll()
+
+	app.writeJSON(writer, http.StatusOK, map[string]any{"users": users}, nil)
+}
+
 func (app *application) activateUser(writer http.ResponseWriter, request *http.Request) {
 	var input struct {
 		TokenPlainText string `json:"token"`

@@ -13,7 +13,7 @@ func (app *application) routes() http.Handler {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
 	router.Use(app.rateLimit)
-	router.Use(app.authenticate)
+	// router.Use(app.authenticate)
 
 	router.NotFound(app.notFoundResponse)
 	router.MethodNotAllowed(app.methodNotAllowedResponse)
@@ -24,14 +24,15 @@ func (app *application) routes() http.Handler {
 		r.Use(app.requireActivatedUser)
 
 		r.Post("/v1/movies", app.requirePermission("movies:write", app.checkHealth))
-		r.Get("/v1/movies", app.listAllMovies)
-		r.Get("/v1/movies/{id}", app.showMovie)
-		r.Patch("/v1/movies/{id}", app.updateMovie)
-		r.Delete("/v1/movies/{id}", app.deleteMovie)
+		r.Get("/v1/movies", app.requirePermission("movies:read", app.listAllMovies))
+		r.Get("/v1/movies/{id}", app.requirePermission("movies:read", app.showMovie))
+		r.Patch("/v1/movies/{id}", app.requirePermission("movies:write", app.updateMovie))
+		r.Delete("/v1/movies/{id}", app.requirePermission("movies:write", app.deleteMovie))
 	})
 
 	router.Put("/v1/users/activated", app.activateUser)
 	router.Post("/v1/users", app.registerUser)
+	router.Get("/v1/users", app.getAllUsers)
 
 	router.Post("/v1/tokens/authentication", app.createAuthenticationToken)
 

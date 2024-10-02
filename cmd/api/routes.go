@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 	router.Group(func(r chi.Router) {
 		r.Use(app.requireActivatedUser)
 
-		r.Post("/v1/movies", app.createMovie)
+		r.Post("/v1/movies", app.requirePermission("movies:write", app.checkHealth))
 		r.Get("/v1/movies", app.listAllMovies)
 		r.Get("/v1/movies/{id}", app.showMovie)
 		r.Patch("/v1/movies/{id}", app.updateMovie)

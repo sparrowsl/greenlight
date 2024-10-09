@@ -53,6 +53,11 @@ func (app *application) registerUser(writer http.ResponseWriter, request *http.R
 		return
 	}
 
+	if err := app.models.Permissions.AddForUser(user.ID, "movies:read"); err != nil {
+		app.serverErrorResponse(writer, request, err)
+		return
+	}
+
 	token, err := app.models.Tokens.New(user.ID, time.Hour*24*3, data.ScopeActivation)
 	if err != nil {
 		app.serverErrorResponse(writer, request, err)

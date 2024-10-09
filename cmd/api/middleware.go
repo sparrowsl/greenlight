@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -118,8 +117,6 @@ func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		user := app.contextGetUser(request)
 
-		fmt.Println("USER:", user.IsAnonymous())
-		fmt.Println("Header:", request.Header.Get("Authorization"))
 		if user.IsAnonymous() {
 			app.authenticationRequiredResponse(writer, request)
 			return

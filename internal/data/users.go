@@ -115,7 +115,7 @@ func (m *UserModel) Insert(user *User) error {
 }
 
 func (m *UserModel) GetAll() ([]User, error) {
-	statement := `SELECT id, name, email, created_at, activated, version 
+	statement := `SELECT id, name, email, created_at, activated, version
 				  FROM users`
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)

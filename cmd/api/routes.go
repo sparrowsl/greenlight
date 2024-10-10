@@ -1,6 +1,7 @@
 package main
 
 import (
+	"expvar"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,6 +21,7 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed(app.methodNotAllowedResponse)
 
 	router.Get("/v1/healthcheck", app.checkHealth)
+	router.Get("/v1/metrics", expvar.Handler().(http.HandlerFunc))
 
 	router.Group(func(r chi.Router) {
 		r.Use(app.requireActivatedUser)

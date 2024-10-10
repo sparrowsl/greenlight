@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base32"
-	"fmt"
 	"time"
 
 	"github.com/sparrowsl/greenlight/internal/validator"
@@ -46,8 +45,7 @@ func (m *TokenModel) Insert(token *Token) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 
-	res, err := m.DB.ExecContext(ctx, query, token.Hash, token.UserID, token.Expiry, token.Scope)
-	fmt.Println(res)
+	_, err := m.DB.ExecContext(ctx, query, token.Hash, token.UserID, token.Expiry, token.Scope)
 	return err
 }
 

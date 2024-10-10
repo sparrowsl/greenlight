@@ -10,6 +10,7 @@ import (
 
 func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
+	router.Use(app.metrics)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)

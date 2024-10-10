@@ -71,3 +71,27 @@ audit:
 
 	@echo 'Running tests...'
 	go test ./... -count=1
+
+
+
+# ================================================================================
+# BUILD
+# ================================================================================
+
+## build/api: build the cmd/api application
+.PHONY: build/api
+build/api:
+	@echo 'Building cmd/api...'
+	go build -o=./bin/api ./cmd/api
+
+
+
+# ================================================================================
+# CLEAN
+# ================================================================================
+
+## clean: clean up files
+.PHONY: clean
+clean:
+	@echo 'Cleaning up files...'
+	rm -rvf ./bin/*

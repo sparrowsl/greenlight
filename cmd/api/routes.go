@@ -12,6 +12,7 @@ func (app *application) routes() http.Handler {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
+	router.Use(app.enableCORS)
 	router.Use(app.rateLimit)
 	router.Use(app.authenticate)
 

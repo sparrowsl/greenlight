@@ -1,4 +1,9 @@
+# Include values from .env file
 include .env
+
+# ================================================================================
+# HELPERS
+# ================================================================================
 
 ## help: print this help message
 .PHONY: help
@@ -10,6 +15,12 @@ help:
 .PHONY: confirm
 confirm:
 	@echo -n 'Are you sure? [y/N]' && read ans && [ $${ans:-N} = y ]
+
+
+
+# ================================================================================
+# DEVELOPMENT
+# ================================================================================
 
 ## run/api: run the ./cmd/api/ application
 .PHONY: run/api
@@ -38,3 +49,25 @@ db/migrations/up: confirm
 db/migrations/down:
 	@echo 'Running down migrations...'
 	goose -dir=migrations postgres ${DATABASE_URL} down
+
+
+
+# ================================================================================
+# QUALITY CONTROL
+# ================================================================================
+
+## audit: tidy dependencies and forma, vet and test all code
+.PHONY: audit
+audit:
+	@echo 'Tidying and verifying module dependencies...'
+	go mod tidy
+	go mod verify
+
+	@echo 'Formatting code...'
+	go fmt ./...
+
+	@echo 'Vetting code...'
+	go vet ./...
+
+	@echo 'Running tests...'
+	go test ./... -count=1

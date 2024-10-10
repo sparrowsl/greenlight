@@ -82,7 +82,13 @@ audit:
 .PHONY: build/api
 build/api:
 	@echo 'Building cmd/api...'
-	go build -o=./bin/api ./cmd/api
+	go build -ldflags="-s" -o=./bin/api ./cmd/api
+	@echo 'Building for linux...'
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s" -o=./bin/api_linux_amd64 ./cmd/api
+	@echo 'Building for OSX/darwin...'
+	GOOS=darwin GOARCH=amd64 go build -ldflags="-s" -o=./bin/api_darwin_amd64 ./cmd/api
+	@echo 'Building for windows...'
+	GOOS=windows GOARCH=amd64 go build -ldflags="-s" -o=./bin/api_windows_amd64 ./cmd/api
 
 
 
